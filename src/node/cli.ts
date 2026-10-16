@@ -100,6 +100,10 @@ export interface UserProvidedArgs extends UserProvidedCodeArgs {
   "abs-proxy-base-path"?: string
   i18n?: string
   "idle-timeout-seconds"?: number
+  guard?: boolean
+  "guard-allow-ip"?: string[]
+  "guard-rate-limit"?: number
+  "guard-trusted-proxy"?: string[]
   "vscode-option"?: string[]
   /* Positional arguments. */
   _?: string[]
@@ -327,6 +331,26 @@ export const options: Options<Required<UserProvidedArgs>> = {
   "idle-timeout-seconds": {
     type: "number",
     description: "Timeout in seconds to wait before shutting down when idle.",
+  },
+  guard: {
+    type: "boolean",
+    description:
+      "Enable optional request screening with Guard Core (https://github.com/Guard-Core/guard-core-ts): per-IP rate \n" +
+      "limiting, IP bans and path/query/header attack detection. Request bodies are not scanned. Off by default.",
+  },
+  "guard-allow-ip": {
+    type: "string[]",
+    description: "With --guard, only accept requests from these IPs or CIDRs. Repeatable.",
+  },
+  "guard-rate-limit": {
+    type: "number",
+    description: "With --guard, the maximum requests per minute for each client IP. Defaults to 1200.",
+  },
+  "guard-trusted-proxy": {
+    type: "string[]",
+    description:
+      "With --guard, proxy IPs or CIDRs whose X-Forwarded-For header is trusted to identify the client. \n" +
+      "Defaults to loopback (127.0.0.1 and ::1). Repeatable.",
   },
   "reconnection-grace-time": {
     type: "string",

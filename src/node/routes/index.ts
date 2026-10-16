@@ -10,6 +10,7 @@ import { plural } from "../../common/util"
 import { App } from "../app"
 import { AuthType, DefaultedArgs } from "../cli"
 import { commit, rootPath } from "../constants"
+import { registerGuard } from "../guard"
 import { Heart } from "../heart"
 import { redirect } from "../http"
 import { CoderSettings, SettingsProvider } from "../settings"
@@ -54,6 +55,10 @@ export const register = async (
 
   app.router.disable("x-powered-by")
   app.wsRouter.disable("x-powered-by")
+
+  // Added first so rejected requests never reach anything else. Does nothing
+  // unless --guard is set.
+  await registerGuard(app, args)
 
   app.router.use(cookieParser())
   app.wsRouter.use(cookieParser())

@@ -35,6 +35,7 @@
 - [What's the difference between code-server and GitHub Codespaces?](#whats-the-difference-between-code-server-and-github-codespaces)
 - [What's the difference between code-server and VS Code web?](#whats-the-difference-between-code-server-and-vs-code-web)
 - [Does code-server have any security login validation?](#does-code-server-have-any-security-login-validation)
+- [How do I rate limit or restrict access to code-server beyond the login?](#how-do-i-rate-limit-or-restrict-access-to-code-server-beyond-the-login)
 - [Are there community projects involving code-server?](#are-there-community-projects-involving-code-server)
 - [How do I change the port?](#how-do-i-change-the-port)
 - [How do I hide the coder/coder promotion in Help: Getting Started?](#how-do-i-hide-the-codercoder-promotion-in-help-getting-started)
@@ -506,6 +507,35 @@ access to the official Microsoft marketplace.
 
 code-server supports setting a single password and limits logins to two per
 minute plus an additional twelve per hour.
+
+## How do I rate limit or restrict access to code-server beyond the login?
+
+Pass `--guard` to enable optional request screening with
+[Guard Core](https://github.com/Guard-Core/guard-core-ts). It is off by default
+and nothing is loaded unless you turn it on. It adds per-IP rate limiting
+(`--guard-rate-limit`, requests per minute, default 1200), automatic IP bans for
+clients that repeatedly send attack patterns, and detection of attack patterns
+in the path, query string and headers. Request bodies are not scanned.
+
+```shell
+code-server --guard --guard-rate-limit 600 --guard-allow-ip 203.0.113.0/24
+```
+
+- `--guard-allow-ip` (repeatable) accepts only the given IPs or CIDRs and
+  rejects everyone else with a 403.
+- The client IP is the address of the direct connection. If you run a reverse
+  proxy, its `X-Forwarded-For` header is only trusted when the proxy connects
+  from loopback (the default) or from an address you pass with
+  `--guard-trusted-proxy` (repeatable). The header is ignored for every other
+  peer, so a client cannot spoof its address.
+- Blocked requests get a 403 (allowlist, bans), a 400 (detected attack pattern)
+  or a 429 (rate limit). Health checks on `/healthz` count toward the rate
+  limit like any other request.
+- Websocket upgrades are screened by the same checks, so the allowlist, bans
+  and rate limit also apply to the editor connection and to proxied ports. The
+  rate limit and bans are tracked per process, separately for regular requests
+  and for upgrades.
+- The login rate limit described above is unchanged and still applies.
 
 ## Are there community projects involving code-server?
 

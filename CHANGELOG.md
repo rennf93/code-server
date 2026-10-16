@@ -22,6 +22,13 @@ Code v99.99.999
 
 ## Unreleased
 
+### Added
+
+- A new optional `--guard` flag enables request screening with Guard Core:
+  per-IP rate limiting, IP bans and attack pattern detection in the path, query
+  and headers. Use `--guard-allow-ip`, `--guard-rate-limit` and
+  `--guard-trusted-proxy` to tune it. It is off by default.
+
 ## [4.141.0](https://github.com/coder/code-server/releases/tag/v4.141.0) - 2026-10-08
 
 Code v1.141.0

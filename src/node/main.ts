@@ -194,6 +194,9 @@ export const runCodeServer = async (
     logger.info(`  - ${plural(args["proxy-domain"].length, "Proxying the following domain")}:`)
     args["proxy-domain"].forEach((domain) => logger.info(`    - ${domain}`))
   }
+  if (args.guard) {
+    logger.info("  - Guard Core request screening is enabled")
+  }
   if (args["skip-auth-preflight"]) {
     logger.info("  - Skipping authentication for preflight requests")
   }
