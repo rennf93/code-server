@@ -99,6 +99,27 @@ describe("guard", () => {
       expect((await get("/robots.txt")).status).toBe(200)
     })
 
+    it("should accept a localhost or LAN Referer", async () => {
+      codeServer = await integration.setup(["--auth=none", "--guard"], "")
+      const referers = [
+        `http://localhost:${codeServer.port()}/`,
+        `http://127.0.0.1:${codeServer.port()}/`,
+        "http://192.168.1.20:8080/",
+      ]
+      const statuses: number[] = []
+      for (const referer of referers) {
+        statuses.push((await get("/robots.txt", { referer })).status)
+      }
+      expect(statuses).toEqual([200, 200, 200])
+    })
+
+    it("should still block an attack in the Referer", async () => {
+      codeServer = await integration.setup(["--auth=none", "--guard"], "")
+      expect((await get("/robots.txt", { referer: "http://example.com/?q=<script>alert(1)</script>" })).status).toBe(
+        400,
+      )
+    })
+
     it("should not scan request bodies", async () => {
       process.env.PASSWORD = "test"
       codeServer = await integration.setup(["--auth=password", "--guard"], "")

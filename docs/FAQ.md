@@ -516,6 +516,7 @@ and nothing is loaded unless you turn it on. It adds per-IP rate limiting
 (`--guard-rate-limit`, requests per minute, default 1200), automatic IP bans for
 clients that repeatedly send attack patterns, and detection of attack patterns
 in the path, query string and headers. Request bodies are not scanned.
+The `ssrf` check is left out because browsers send the page address as the `Referer` header, and Guard Core 4.4.0 flags localhost and LAN addresses in it.
 
 ```shell
 code-server --guard --guard-rate-limit 600 --guard-allow-ip 203.0.113.0/24

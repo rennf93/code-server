@@ -5,6 +5,28 @@ import { DefaultedArgs } from "./cli"
 
 const DEFAULT_RATE_LIMIT = 1200
 const DEFAULT_TRUSTED_PROXIES = ["127.0.0.1", "::1"]
+// Browsers send the page address as Referer, and guard-core 4.4.0 flags localhost and LAN addresses in it as ssrf.
+// @guardcore/core does not export its category list, so this is every category except ssrf.
+const DETECTION_CATEGORIES = [
+  "xss",
+  "sqli",
+  "dir_traversal",
+  "path_traversal",
+  "cmd_injection",
+  "file_inclusion",
+  "ldap",
+  "xml",
+  "nosql",
+  "file_upload",
+  "template",
+  "http_split",
+  "sensitive_file",
+  "cms_probing",
+  "recon",
+  "proto_pollution",
+  "code_injection",
+  "deserialization",
+]
 
 /**
  * Build the Guard Core configuration from the CLI arguments.
@@ -24,6 +46,7 @@ export const guardConfig = (args: DefaultedArgs): SecurityConfig => {
     // X-Forwarded-For is only honored when the direct peer is one of these.
     trustedProxies: args["guard-trusted-proxy"]?.length ? args["guard-trusted-proxy"] : DEFAULT_TRUSTED_PROXIES,
     securityHeaders: { enabled: false },
+    enabledDetectionCategories: DETECTION_CATEGORIES,
     logger: {
       info: (message) => logger.debug(message),
       warn: (message) => logger.warn(message),
